@@ -4,4 +4,3 @@ bootstrap:
     - keyboard
     - source
     - storage
-    - identity
