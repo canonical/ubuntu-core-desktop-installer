@@ -1,14 +1,13 @@
-name: ubuntu-flavor-installer
+name: ubuntu-core-desktop-installer
 version: git
-summary: Ubuntu Flavor Installer
+summary: Ubuntu Core Desktop Installer
 description: |
-  This project is a modern implementation of the Ubuntu Flavor installer,
-  using subiquity as a backend and Flutter for the UI.
+  Ubuntu Core Desktop Installer
 grade: stable
 confinement: classic
 base: core22
-issues: https://bugs.launchpad.net/ubuntu-flavor-installer/+filebug
-contact: https://bugs.launchpad.net/ubuntu-flavor-installer/+filebug
+issues: https://github.com/canonical/ubuntu-core-desktop-installer/issues
+contact: https://github.com/canonical/ubuntu-core-desktop-installer/issues
 
 apps:
   subiquity-server:
@@ -23,10 +22,12 @@ apps:
   subiquity-loadkeys:
     command: bin/subiquity/bin/subiquity-loadkeys
 
-  ubuntu-flavor-installer:
-    command: bin/ubuntu-flavor-installer
+  ubuntu-core-desktop-installer:
+    command: bin/ubuntu-core-desktop-installer
     command-chain: [bin/launcher]
-    desktop: bin/data/flutter_assets/assets/ubuntu-flavor-installer.desktop
+    daemon: simple
+    restart-condition: always
+    desktop: bin/data/flutter_assets/assets/ubuntu-core-desktop-installer.desktop
     environment:
       PATH: $SNAP/usr/bin:$SNAP/bin:$PATH
       LIBGL_DRIVERS_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/dri
@@ -147,7 +148,7 @@ parts:
       - zip
     override-prime: ''
 
-  ubuntu-flavor-installer:
+  ubuntu-core-desktop-installer:
     after: [flutter-git]
     source: .
     source-type: git

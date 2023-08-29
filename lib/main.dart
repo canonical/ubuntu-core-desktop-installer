@@ -9,8 +9,8 @@ Future<void> main(List<String> args) {
   return runInstallerApp(
     args,
     flavor: const UbuntuFlavor(
-      id: 'ubuntu-flavor',
-      name: 'Ubuntu FLAVOR',
+      id: 'ubuntu-core-desktop',
+      name: 'Ubuntu Core Desktop',
     ),
     theme: yaruMagentaLight,
     darkTheme: yaruMagentaDark,
