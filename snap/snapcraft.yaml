@@ -27,6 +27,7 @@ apps:
     command-chain: [bin/launcher]
     daemon: simple
     restart-condition: always
+    restart-delay: 3s
     desktop: bin/data/flutter_assets/assets/ubuntu-core-desktop-installer.desktop
     environment:
       PATH: $SNAP/usr/bin:$SNAP/bin:$PATH
@@ -157,7 +158,6 @@ parts:
     override-build: |
       set -eux
       mkdir -p $CRAFT_PART_INSTALL/bin/lib
-      cp snap/local/launcher $CRAFT_PART_INSTALL/bin/
       cp snap/local/subiquity-server $CRAFT_PART_INSTALL/bin/
       cp -r vendor/ubuntu-desktop-provision/packages/subiquity_client/subiquity $CRAFT_PART_INSTALL/bin/
       mkdir -p $CRAFT_PART_INSTALL/etc/subiquity
@@ -167,6 +167,19 @@ parts:
       flutter pub get
       flutter build linux --release -v
       cp -r build/linux/*/release/bundle/* $CRAFT_PART_INSTALL/bin/
+
+  launcher:
+    plugin: dump
+    source: launcher
+    stage-packages:
+      - inotify-tools
+    override-build: |
+      mkdir -p $CRAFT_PART_INSTALL/bin
+      cp -p launcher $CRAFT_PART_INSTALL/bin/launcher
+    prime:
+      - usr/bin/*notify*
+      - usr/lib/*/libinotifytools.so.*
+      - bin/launcher
 
   libraries:
     plugin: nil
