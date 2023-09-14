@@ -23,12 +23,6 @@ fi
 export XDG_CACHE_HOME="$SNAP_USER_COMMON/.cache"
 [ -d "$XDG_CACHE_HOME" ] ||  mkdir -p "$XDG_CACHE_HOME"
 
-# Workaround for flickering corners and other graphical glitches with GTK's
-# OpenGL backend for X11. See:
-# - https://github.com/canonical/ubuntu-desktop-installer/issues/1397
-# - https://gitlab.gnome.org/GNOME/gtk/-/issues/5600
-export GDK_RENDERING=image
-
 export GDK_PIXBUF_MODULE_FILE="$XDG_CACHE_HOME/gdk-pixbuf-loaders.cache"
 export GDK_PIXBUF_MODULEDIR="$SNAP/usr/lib/$ARCH/gdk-pixbuf-2.0/2.10.0/loaders"
 if [ "$needs_update" = true ] || [ ! -f "$GDK_PIXBUF_MODULE_FILE" ]; then
@@ -47,4 +41,39 @@ trap "sudo rm -f /run/udev/rules.d/90-udisks-inhibit.rules; sudo udevadm control
 sudo udevadm control --reload
 sudo udevadm trigger --subsystem-match=block
 
-"$@"
+if ! command -v inotifywait > /dev/null
+then
+    echo "ERROR: inotifywait could not be found, ubuntu-core-desktop-installer expects:"
+    echo " . . :     stage-packages:"
+    echo " . . :        - inotify-tools"
+    exit 1
+fi
+
+wait_for()
+{
+  until
+    until
+      echo "Setting up watch for $1"
+      inotifywait --event create "$(dirname "$1")"&
+      inotify_pid=$!
+      [ -e "$1" ] || sleep 2 && [ -e "$1" ]
+    do
+      wait "${inotify_pid}"
+    done
+    kill "${inotify_pid}"
+    [ -O "$1" ]
+  do
+    sleep 1
+  done
+  echo "$1 exists"
+}
+
+export XDG_RUNTIME_DIR=/run/user/0
+mkdir -p "$XDG_RUNTIME_DIR" -m 700
+export WAYLAND_DISPLAY="${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY:-wayland-0}"
+
+wait_for "${WAYLAND_DISPLAY}"
+
+unset DISPLAY
+
+exec "$@"
