@@ -8,6 +8,8 @@ confinement: classic
 base: core22
 issues: https://github.com/canonical/ubuntu-core-desktop-installer/issues
 contact: https://github.com/canonical/ubuntu-core-desktop-installer/issues
+architectures:
+- amd64
 
 apps:
   subiquity-server:
