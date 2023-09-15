@@ -26,7 +26,7 @@ apps:
 
   ubuntu-core-desktop-installer:
     command: bin/ubuntu-core-desktop-installer
-    command-chain: [bin/launcher]
+    command-chain: [bin/desktop-launch, bin/wayland-launch]
     daemon: simple
     restart-condition: always
     restart-delay: 3s
@@ -38,10 +38,13 @@ apps:
       LIVE_RUN: 1
       LOG_LEVEL: debug
       SNAP_PYTHON: python3
+      LIBGL_DEBUG: verbose
+      MESA_DEBUG: 1
+      LIBGL_ALWAYS_SOFTWARE: 1
 
   installer:
     command: bin/ubuntu-core-desktop-installer
-    command-chain: [bin/launcher]
+    command-chain: [bin/desktop-launch, bin/wayland-launch]
     desktop: bin/data/flutter_assets/assets/ubuntu-core-desktop-installer.desktop
     environment:
       PATH: $SNAP/usr/bin:$SNAP/bin:$PATH
@@ -50,6 +53,9 @@ apps:
       LIVE_RUN: 1
       LOG_LEVEL: debug
       SNAP_PYTHON: python3
+      LIBGL_DEBUG: verbose
+      MESA_DEBUG: 1
+      LIBGL_ALWAYS_SOFTWARE: 1
 
   probert:
     command: bin/probert
@@ -189,11 +195,11 @@ parts:
       - inotify-tools
     override-build: |
       mkdir -p $CRAFT_PART_INSTALL/bin
-      cp -p launcher $CRAFT_PART_INSTALL/bin/launcher
+      cp -p *launch $CRAFT_PART_INSTALL/bin/
     prime:
       - usr/bin/*notify*
       - usr/lib/*/libinotifytools.so.*
-      - bin/launcher
+      - bin/*launch
 
   libraries:
     plugin: nil
@@ -208,6 +214,7 @@ parts:
       - libglib2.0-0
       - libglib2.0-dev
       - libgtk-3-0
+      - libhandy-1-0
       - libpango-1.0-0
       - libpangocairo-1.0-0
       - libpng16-16
@@ -225,49 +232,27 @@ parts:
       - libglib2.0-bin
       - libibus-1.0-5
       - gnome-session-canberra
+      - libglapi-mesa
+      - libglu1-mesa
+      - libglx-mesa0
+      - mesa-vdpau-drivers
+      - mesa-vulkan-drivers
     prime:
-      - usr/lib/*/libEGL*.so.*
-      - usr/lib/*/libGL*.so.*
-      - usr/lib/*/libX*.so.*
-      - usr/lib/*/liba*.so.*
-      - usr/lib/*/libcairo*.so.*
-      - usr/lib/*/libe*.so.*
-      - usr/lib/*/libf*.so.*
-      - usr/lib/*/libg*.so.*
-      - usr/lib/*/libharfbuzz*.so.*
-      - usr/lib/*/libibus*.so.*
-      - usr/lib/*/libpango*.so.*
-      - usr/lib/*/libpixman*.so.*
-      - usr/lib/*/libpng*.so.*
-      - usr/lib/*/libthai*.so.*
-      - usr/lib/*/libwayland*.so.*
-      - usr/lib/*/libxcb*.so.*
-      - usr/lib/*/libxkb*.so.*
-      - usr/lib/*/libdatrie*.so.*
-      - usr/lib/*/libdrm*.so.*
-      - usr/lib/*/libgbm*.so.*
-      - usr/lib/*/libglapi*.so.*
-      - usr/lib/*/libgraphite2*.so.*
-      - usr/lib/*/libxshmfence*.so.*
-      - usr/lib/*/libpciaccess*.so.*
-      - usr/lib/*/libsensors*.so.*
-      - usr/lib/*/libvulkan*.so.*
-      - usr/share/glvnd/egl_vendor.d
-      - usr/lib/*/gdk-pixbuf-2.0
-      - usr/lib/*/
-      - usr/bin/update-mime-database
-      - usr/bin/g*
-      - usr/bin/canberra-gtk-play
-      - usr/share/mime
       - -usr/lib/*/pkgconfig
       - -usr/lib/pkgconfig
       - -usr/share/pkgconfig
+    override-stage: |
+      craftctl default
+      for file in $(find . -path "*/icd.d/*"); do
+        sed -i 's#\/usr#\/snap\/ubuntu-core-desktop-installer\/current\/usr#' $file
+      done
 
   dri-no-patchelf:
     after: [libraries]
     plugin: nil
     stage-packages:
       - libgl1-mesa-dri
+      - mesa-va-drivers
     build-attributes:
       - no-patchelf # Otherwise snapcraft may strip the build ID and cause the driver to crash
     stage:

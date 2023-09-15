@@ -12,7 +12,6 @@ dependencies:
   flutter_html: 3.0.0-beta.1
   flutter_localizations:
     sdk: flutter
-  handy_window: ^0.3.0
   ubuntu_bootstrap:
     path: vendor/ubuntu-desktop-provision/packages/ubuntu_bootstrap
   ubuntu_flavor: ^0.2.0
