@@ -65,14 +65,15 @@ wait_for()
   do
     sleep 1
   done
-  echo "$1 exists"
 }
 
 export XDG_RUNTIME_DIR=/run/user/0
 mkdir -p "$XDG_RUNTIME_DIR" -m 700
 export WAYLAND_DISPLAY="${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY:-wayland-0}"
 
-wait_for "${WAYLAND_DISPLAY}"
+if ! [ -f ${WAYLAND_DISPLAY} ]; then
+  wait_for "${WAYLAND_DISPLAY}"
+fi
 
 unset DISPLAY
 
