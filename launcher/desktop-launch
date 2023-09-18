@@ -54,6 +54,10 @@ fi
 
 [ "$needs_update" = true ] && echo "SNAP_DESKTOP_LAST_REVISION=$SNAP_REVISION" > "$SNAP_USER_DATA/.last_revision"
 
+# Add libcanberra path
+append_dir LD_LIBRARY_PATH "$SNAP/usr/lib/$ARCH/libcanberra-0.30"
+append_dir LD_LIBRARY_PATH "$SNAP/usr/lib/$ARCH/pulseaudio"
+
 # Mesa Libs for OpenGL support
 append_dir LD_LIBRARY_PATH "$SNAP/usr/lib/$ARCH/mesa"
 append_dir LD_LIBRARY_PATH "$SNAP/usr/lib/$ARCH/mesa-egl"
