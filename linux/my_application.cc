@@ -20,6 +20,7 @@ static void my_application_activate(GApplication* application) {
   gtk_window_set_application(window, GTK_APPLICATION(application));
   gtk_window_fullscreen(GTK_WINDOW(window));
   gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
+  gtk_window_set_deletable(GTK_WINDOW(window), FALSE);
   gtk_widget_realize(GTK_WIDGET(window));
   gtk_widget_show(GTK_WIDGET(window));
 
