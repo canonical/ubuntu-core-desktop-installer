@@ -38,9 +38,7 @@ apps:
       LIVE_RUN: 1
       LOG_LEVEL: debug
       SNAP_PYTHON: python3
-      LIBGL_DEBUG: verbose
-      MESA_DEBUG: 1
-      LIBGL_ALWAYS_SOFTWARE: 1
+      XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
 
   installer:
     command: bin/ubuntu-core-desktop-installer
@@ -53,9 +51,7 @@ apps:
       LIVE_RUN: 1
       LOG_LEVEL: debug
       SNAP_PYTHON: python3
-      LIBGL_DEBUG: verbose
-      MESA_DEBUG: 1
-      LIBGL_ALWAYS_SOFTWARE: 1
+      XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
 
   probert:
     command: bin/probert
@@ -237,7 +233,42 @@ parts:
       - libglx-mesa0
       - mesa-vdpau-drivers
       - mesa-vulkan-drivers
+      - xkb-data
     prime:
+      - usr/lib/*/libEGL*.so.*
+      - usr/lib/*/libGL*.so.*
+      - usr/lib/*/libX*.so.*
+      - usr/lib/*/liba*.so.*
+      - usr/lib/*/libcairo*.so.*
+      - usr/lib/*/libe*.so.*
+      - usr/lib/*/libf*.so.*
+      - usr/lib/*/libg*.so.*
+      - usr/lib/*/libharfbuzz*.so.*
+      - usr/lib/*/libibus*.so.*
+      - usr/lib/*/libpango*.so.*
+      - usr/lib/*/libpixman*.so.*
+      - usr/lib/*/libpng*.so.*
+      - usr/lib/*/libthai*.so.*
+      - usr/lib/*/libwayland*.so.*
+      - usr/lib/*/libxcb*.so.*
+      - usr/lib/*/libxkb*.so.*
+      - usr/lib/*/libdatrie*.so.*
+      - usr/lib/*/libdrm*.so.*
+      - usr/lib/*/libgbm*.so.*
+      - usr/lib/*/libglapi*.so.*
+      - usr/lib/*/libgraphite2*.so.*
+      - usr/lib/*/libxshmfence*.so.*
+      - usr/lib/*/libpciaccess*.so.*
+      - usr/lib/*/libsensors*.so.*
+      - usr/lib/*/libvulkan*.so.*
+      - usr/share/glvnd/egl_vendor.d
+      - usr/share/X11/xkb
+      - usr/lib/*/gdk-pixbuf-2.0
+      - usr/lib/*/
+      - usr/bin/update-mime-database
+      - usr/bin/g*
+      - usr/bin/canberra-gtk-play
+      - usr/share/mime
       - -usr/lib/*/pkgconfig
       - -usr/lib/pkgconfig
       - -usr/share/pkgconfig
@@ -270,3 +301,22 @@ parts:
       done
       sed -i 's/mkdir "$tmpmnt"/mkdir -p "$tmpmnt"/' \
           usr/lib/os-probes/50mounted-tests
+
+  workarounds:
+    plugin: nil
+    stage-packages:
+      - ubuntu-sounds
+      - libcanberra-pulse
+      - libpulse0
+      - libsndfile1
+      - libasyncns0
+    prime:
+      - usr/share/sounds/ubuntu/stereo/system-ready.ogg
+      - usr/share/sounds/ubuntu/stereo/dialog-question.ogg
+      - usr/lib/*/libcanberra-0.30/libcanberra-pulse.so
+      - usr/lib/*/*pulse*
+      - usr/lib/*/libsndfile.so.*
+      - usr/lib/*/libasyncns.so.*
+      - usr/lib/*/libFLAC.so.*
+      - usr/lib/*/libvorbisenc.so.*
+      - usr/lib/*/libopus.so.*

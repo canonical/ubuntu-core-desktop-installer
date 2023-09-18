@@ -83,7 +83,7 @@ append_dir LD_LIBRARY_PATH "/var/lib/snapd/lib/gl"
 # Export Vulkan ICD filename paths
 export VK_ICD_FILENAMES="/var/lib/snapd/lib/vulkan/icd.d/nvidia_icd.json:$SNAP/usr/share/vulkan/icd.d/radeon_icd.x86_64.json:$SNAP/usr/share/vulkan/icd.d/radeon_icd.i686.json:$SNAP/usr/share/vulkan/icd.d/intel_icd.x86_64.json:$SNAP/usr/share/vulkan/icd.d/intel_icd.i686.json"
 
-export _EGL_VENDOR_LIBRARY_DIRS=$SNAP/usr/share/glvnd/egl_vendor.d/
+export __EGL_VENDOR_LIBRARY_DIRS=$SNAP/usr/share/glvnd/egl_vendor.d/
 
 # Disable storage automounting (/usr/lib/udisks2/udisks2-inhibit)
 sudo mkdir -p /run/udev/rules.d
