@@ -26,7 +26,7 @@ apps:
 
   ubuntu-core-desktop-installer:
     command: bin/ubuntu-core-desktop-installer
-    command-chain: [bin/desktop-launch, bin/wayland-launch]
+    command-chain: [bin/desktop-launch, bin/disable-automount-launch, bin/wayland-launch]
     daemon: simple
     restart-condition: always
     restart-delay: 3s
@@ -39,6 +39,22 @@ apps:
       LOG_LEVEL: debug
       SNAP_PYTHON: python3
       XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
+
+  frame:
+    command-chain: [bin/frame-launch, bin/desktop-launch]
+    command: usr/bin/mir_demo_server
+    daemon: simple
+    restart-condition: always
+    restart-delay: 3s
+    environment:
+      # XDG config
+      XDG_CONFIG_HOME: $SNAP_DATA
+      HOME: $SNAP_DATA
+      MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/mir/server-platform
+      LIBINPUT_QUIRKS_DIR: ${SNAP}/usr/share/libinput
+      # Setup XKB
+      XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
+      XCURSOR_PATH: $SNAP/usr/share/icons
 
   probert:
     command: bin/probert
@@ -288,6 +304,22 @@ parts:
       done
       sed -i 's/mkdir "$tmpmnt"/mkdir -p "$tmpmnt"/' \
           usr/lib/os-probes/50mounted-tests
+
+  mir-server:
+    plugin: nil
+    stage-packages:
+      - mir-test-tools
+      - mir-platform-graphics-gbm-kms
+      - mir-platform-graphics-eglstream-kms
+      - libinput-bin
+      - dmz-cursor-theme
+      - fonts-ubuntu
+    prime:
+      - usr/lib/${CRAFT_ARCH_TRIPLET}
+      - usr/bin/mir_demo_server
+      - usr/share/libinput
+      - usr/share/icons
+      - usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf
 
   workarounds:
     plugin: nil
