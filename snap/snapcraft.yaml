@@ -142,6 +142,8 @@ parts:
       - ubuntu-advantage-tools
       # WSL specifics:
       - language-selector-common
+      - lvm2
+      - lshw
       - locales
     prime:
       - -lib/systemd/system/*
