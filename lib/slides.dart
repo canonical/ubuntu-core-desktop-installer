@@ -9,8 +9,8 @@ const bodyStyle = TextStyle(color: Colors.white, fontSize: 18);
 
 final installationSlides = [
   _buildFirstSlide,
-  _buildSecondSlide,
-  _buildThirdSlide,
+  //_buildSecondSlide,
+  //_buildThirdSlide,
 ];
 
 Widget _buildFirstSlide(BuildContext context) {
