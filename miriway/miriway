@@ -1,0 +1,36 @@
+#! /bin/sh
+set -e
+
+bindir=$(dirname "$0")
+if [ "${bindir}" != "" ]; then bindir="${bindir}/"; fi
+
+if [ ! -d "${XDG_RUNTIME_DIR}" ]
+then
+  echo "Error: XDG_RUNTIME_DIR '${XDG_RUNTIME_DIR}' does not exists"
+  exit 1
+fi
+
+if [ -n "${WAYLAND_DISPLAY}" ] && [ -O "${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}" ]
+then
+  echo "Info: wayland endpoint '${WAYLAND_DISPLAY}' already exists, using it as host"
+  export MIR_SERVER_WAYLAND_HOST="${WAYLAND_DISPLAY}"
+  unset WAYLAND_DISPLAY
+  unset DISPLAY
+fi
+
+if [ -e "/etc/xdg/xdg-miriway" ] && [ "${XDG_CONFIG_DIRS#*/etc/xdg/xdg-miriway}" = "${XDG_CONFIG_DIRS}" ]
+then
+  export XDG_CONFIG_DIRS="/etc/xdg/xdg-miriway:${XDG_CONFIG_DIRS:-/etc/xdg}"
+fi
+
+if [ -e "/usr/local/etc/xdg/xdg-miriway" ] && [ "${XDG_CONFIG_DIRS#*/usr/local/etc/xdg/xdg-miriway}" = "${XDG_CONFIG_DIRS}" ]
+then
+  export XDG_CONFIG_DIRS="/usr/local/etc/xdg/xdg-miriway:${XDG_CONFIG_DIRS:-/etc/xdg}"
+fi
+
+if command -v Xwayland > /dev/null
+then
+  export MIR_SERVER_ENABLE_X11=1
+fi
+
+exec "${bindir}"miriway-shell --shell-component="swaybg -c #2C001E -i $SNAP/bin/data/flutter_assets/assets/slides/background.png"
