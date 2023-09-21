@@ -11,6 +11,10 @@ contact: https://github.com/canonical/ubuntu-core-desktop-installer/issues
 architectures:
 - amd64
 
+package-repositories:
+ - type: apt
+   ppa: mir-team/release
+
 apps:
   subiquity-server:
     command: bin/subiquity-server
@@ -39,9 +43,9 @@ apps:
       SNAP_PYTHON: python3
       XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
 
-  frame:
+  miriway:
     command-chain: [bin/frame-launch, bin/desktop-launch]
-    command: usr/bin/mir_demo_server
+    command: usr/local/bin/miriway
     daemon: simple
     restart-condition: always
     restart-delay: 3s
@@ -306,18 +310,25 @@ parts:
       sed -i 's/mkdir "$tmpmnt"/mkdir -p "$tmpmnt"/' \
           usr/lib/os-probes/50mounted-tests
 
-  mir-server:
-    plugin: nil
+  miriway:
+    plugin: cmake
+    source: miriway
+    build-packages:
+      - libmiral-dev
     stage-packages:
-      - mir-test-tools
+      - libmiral6
       - mir-platform-graphics-gbm-kms
       - mir-platform-graphics-eglstream-kms
       - libinput-bin
       - dmz-cursor-theme
       - fonts-ubuntu
+      - swaybg
+      - libgdk-pixbuf-2.0-0
     prime:
+      - usr/bin/swaybg
+      - usr/local/bin/miriway
+      - usr/local/bin/miriway-shell
       - usr/lib/${CRAFT_ARCH_TRIPLET}
-      - usr/bin/mir_demo_server
       - usr/share/libinput
       - usr/share/icons
       - usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf
