@@ -26,11 +26,10 @@ apps:
 
   ubuntu-core-desktop-installer:
     command: bin/ubuntu-core-desktop-installer
-    command-chain: [bin/launcher]
+    command-chain: [bin/desktop-launch, bin/disable-automount-launch, bin/wayland-launch]
     daemon: simple
     restart-condition: always
     restart-delay: 3s
-    desktop: bin/data/flutter_assets/assets/ubuntu-core-desktop-installer.desktop
     environment:
       PATH: $SNAP/usr/bin:$SNAP/bin:$PATH
       LIBGL_DRIVERS_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/dri
@@ -38,18 +37,23 @@ apps:
       LIVE_RUN: 1
       LOG_LEVEL: debug
       SNAP_PYTHON: python3
+      XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
 
-  installer:
-    command: bin/ubuntu-core-desktop-installer
-    command-chain: [bin/launcher]
-    desktop: bin/data/flutter_assets/assets/ubuntu-core-desktop-installer.desktop
+  frame:
+    command-chain: [bin/frame-launch, bin/desktop-launch]
+    command: usr/bin/mir_demo_server
+    daemon: simple
+    restart-condition: always
+    restart-delay: 3s
     environment:
-      PATH: $SNAP/usr/bin:$SNAP/bin:$PATH
-      LIBGL_DRIVERS_PATH: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/dri
-      GIO_MODULE_DIR: $SNAP/usr/lib/$CRAFT_ARCH_TRIPLET/gio/modules
-      LIVE_RUN: 1
-      LOG_LEVEL: debug
-      SNAP_PYTHON: python3
+      # XDG config
+      XDG_CONFIG_HOME: $SNAP_DATA
+      HOME: $SNAP_DATA
+      MIR_SERVER_PLATFORM_PATH: ${SNAP}/usr/lib/${CRAFT_ARCH_TRIPLET}/mir/server-platform
+      LIBINPUT_QUIRKS_DIR: ${SNAP}/usr/share/libinput
+      # Setup XKB
+      XKB_CONFIG_ROOT: $SNAP/usr/share/X11/xkb
+      XCURSOR_PATH: $SNAP/usr/share/icons
 
   probert:
     command: bin/probert
@@ -137,6 +141,9 @@ parts:
       - ubuntu-advantage-tools
       # WSL specifics:
       - language-selector-common
+      - lvm2
+      - lshw
+      - parted
       - locales
     prime:
       - -lib/systemd/system/*
@@ -189,11 +196,11 @@ parts:
       - inotify-tools
     override-build: |
       mkdir -p $CRAFT_PART_INSTALL/bin
-      cp -p launcher $CRAFT_PART_INSTALL/bin/launcher
+      cp -p *launch $CRAFT_PART_INSTALL/bin/
     prime:
       - usr/bin/*notify*
       - usr/lib/*/libinotifytools.so.*
-      - bin/launcher
+      - bin/*launch
 
   libraries:
     plugin: nil
@@ -208,6 +215,7 @@ parts:
       - libglib2.0-0
       - libglib2.0-dev
       - libgtk-3-0
+      - libhandy-1-0
       - libpango-1.0-0
       - libpangocairo-1.0-0
       - libpng16-16
@@ -225,6 +233,12 @@ parts:
       - libglib2.0-bin
       - libibus-1.0-5
       - gnome-session-canberra
+      - libglapi-mesa
+      - libglu1-mesa
+      - libglx-mesa0
+      - mesa-vdpau-drivers
+      - mesa-vulkan-drivers
+      - xkb-data
     prime:
       - usr/lib/*/libEGL*.so.*
       - usr/lib/*/libGL*.so.*
@@ -253,6 +267,7 @@ parts:
       - usr/lib/*/libsensors*.so.*
       - usr/lib/*/libvulkan*.so.*
       - usr/share/glvnd/egl_vendor.d
+      - usr/share/X11/xkb
       - usr/lib/*/gdk-pixbuf-2.0
       - usr/lib/*/
       - usr/bin/update-mime-database
@@ -262,6 +277,11 @@ parts:
       - -usr/lib/*/pkgconfig
       - -usr/lib/pkgconfig
       - -usr/share/pkgconfig
+    override-stage: |
+      craftctl default
+      for file in $(find . -path "*/icd.d/*"); do
+        sed -i 's#\/usr#\/snap\/ubuntu-core-desktop-installer\/current\/usr#' $file
+      done
 
   dri-no-patchelf:
     after: [libraries]
@@ -285,3 +305,38 @@ parts:
       done
       sed -i 's/mkdir "$tmpmnt"/mkdir -p "$tmpmnt"/' \
           usr/lib/os-probes/50mounted-tests
+
+  mir-server:
+    plugin: nil
+    stage-packages:
+      - mir-test-tools
+      - mir-platform-graphics-gbm-kms
+      - mir-platform-graphics-eglstream-kms
+      - libinput-bin
+      - dmz-cursor-theme
+      - fonts-ubuntu
+    prime:
+      - usr/lib/${CRAFT_ARCH_TRIPLET}
+      - usr/bin/mir_demo_server
+      - usr/share/libinput
+      - usr/share/icons
+      - usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf
+
+  workarounds:
+    plugin: nil
+    stage-packages:
+      - ubuntu-sounds
+      - libcanberra-pulse
+      - libpulse0
+      - libsndfile1
+      - libasyncns0
+    prime:
+      - usr/share/sounds/ubuntu/stereo/system-ready.ogg
+      - usr/share/sounds/ubuntu/stereo/dialog-question.ogg
+      - usr/lib/*/libcanberra-0.30/libcanberra-pulse.so
+      - usr/lib/*/*pulse*
+      - usr/lib/*/libsndfile.so.*
+      - usr/lib/*/libasyncns.so.*
+      - usr/lib/*/libFLAC.so.*
+      - usr/lib/*/libvorbisenc.so.*
+      - usr/lib/*/libopus.so.*
