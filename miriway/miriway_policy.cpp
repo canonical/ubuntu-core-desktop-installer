@@ -300,10 +300,12 @@ void miriway::WindowManagerPolicy::handle_modify_window(WindowInfo& window_info,
 
 void miriway::WindowManagerPolicy::handle_request_move(WindowInfo& /*window_info*/, MirInputEvent const* /*input_event*/)
 {
+    // Override handle_request_move to prevent window move
 }
 
 void miriway::WindowManagerPolicy::handle_request_resize(WindowInfo& /*window_info*/, MirInputEvent const* /*input_event*/, MirResizeEdge /*edge*/)
 {
+    // Override handle_request_resize to prevent window resize
 }
 
 bool miriway::WindowManagerPolicy::handle_pointer_event(MirPointerEvent const* event)
