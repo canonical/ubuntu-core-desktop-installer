@@ -298,6 +298,14 @@ void miriway::WindowManagerPolicy::handle_modify_window(WindowInfo& window_info,
     MinimalWindowManager::handle_modify_window(window_info, mods);
 }
 
+void miriway::WindowManagerPolicy::handle_request_move(WindowInfo& /*window_info*/, MirInputEvent const* /*input_event*/)
+{
+}
+
+void miriway::WindowManagerPolicy::handle_request_resize(WindowInfo& /*window_info*/, MirInputEvent const* /*input_event*/, MirResizeEdge /*edge*/)
+{
+}
+
 void miriway::WindowManagerPolicy::change_active_workspace(
     std::shared_ptr<Workspace> const& new_active,
     std::shared_ptr<Workspace> const& old_active,
