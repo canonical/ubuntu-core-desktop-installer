@@ -55,6 +55,10 @@ private:
 
     void handle_modify_window(WindowInfo& window_info, WindowSpecification const& modifications) override;
 
+    void handle_request_move(WindowInfo& /*window_info*/, MirInputEvent const* /*input_event*/);
+
+    void handle_request_resize(WindowInfo& /*window_info*/, MirInputEvent const* /*input_event*/, MirResizeEdge /*edge*/);
+
     void advise_adding_to_workspace(std::shared_ptr<Workspace> const& workspace,
                                     std::vector<Window> const& windows) override;
 
