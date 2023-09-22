@@ -306,6 +306,23 @@ void miriway::WindowManagerPolicy::handle_request_resize(WindowInfo& /*window_in
 {
 }
 
+bool miriway::WindowManagerPolicy::handle_pointer_event(MirPointerEvent const* event)
+{
+    // Override handle_pointer_event to ensure we don't allow dragging windows
+    auto const action = mir_pointer_event_action(event);
+
+    Point const cursor{
+        mir_pointer_event_axis_value(event, mir_pointer_axis_x),
+        mir_pointer_event_axis_value(event, mir_pointer_axis_y)};
+
+    if (action == mir_pointer_action_button_down)
+    {
+        tools.select_active_window(tools.window_at(cursor));
+    }
+
+    return false;
+}
+
 void miriway::WindowManagerPolicy::change_active_workspace(
     std::shared_ptr<Workspace> const& new_active,
     std::shared_ptr<Workspace> const& old_active,
