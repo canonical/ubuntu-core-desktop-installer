@@ -59,6 +59,8 @@ private:
 
     void handle_request_resize(WindowInfo& /*window_info*/, MirInputEvent const* /*input_event*/, MirResizeEdge /*edge*/);
 
+    bool handle_pointer_event(MirPointerEvent const* event);
+
     void advise_adding_to_workspace(std::shared_ptr<Workspace> const& workspace,
                                     std::vector<Window> const& windows) override;
 
