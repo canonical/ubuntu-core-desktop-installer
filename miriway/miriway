@@ -33,4 +33,4 @@ then
   export MIR_SERVER_ENABLE_X11=1
 fi
 
-exec "${bindir}"miriway-shell --shell-component="swaybg -c #2C001E"
+exec "${bindir}"miriway-shell --display-autoscale=1200 --shell-component="swaybg -c #2C001E"
